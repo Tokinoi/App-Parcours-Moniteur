@@ -1,0 +1,46 @@
+name: Submit latest Android build
+
+on:
+  workflow_dispatch:
+
+jobs:
+  submit:
+    runs-on: ubuntu-latest
+    environment: production
+    env:
+      EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+      GOOGLE_PLAY_SERVICE_ACCOUNT_JSON: ${{ secrets.GOOGLE_PLAY_SERVICE_ACCOUNT_JSON }}
+    steps:
+      - name: Verify Expo token
+        run: |
+          if [ -z "${EXPO_TOKEN}" ]; then
+            echo "Missing EXPO_TOKEN secret"
+            exit 1
+          fi
+
+      - name: Verify Play service account secret
+        run: |
+          if [ -z "${GOOGLE_PLAY_SERVICE_ACCOUNT_JSON}" ]; then
+            echo "Missing GOOGLE_PLAY_SERVICE_ACCOUNT_JSON secret"
+            exit 1
+          fi
+
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Use Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Set up Play Store service account file
+        run: |
+          mkdir -p secrets
+          printf '%s' "$GOOGLE_PLAY_SERVICE_ACCOUNT_JSON" > secrets/google-play-service-account.json
+
+      - name: Submit latest Android build to Play Store
+        run: npx eas-cli@latest submit --platform android --profile production --latest --non-interactive
