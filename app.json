@@ -1,7 +1,7 @@
 {
   "expo": {
     "name": "Parcours Moniteur",
-    "slug": "app-parcours-moniteur",
+    "slug": "parcours-moniteur",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
@@ -46,6 +46,13 @@
     ],
     "experiments": {
       "typedRoutes": true
-    }
+    },
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "a1145cf2-fdb4-44b3-ac37-e04e922fad10"
+      }
+    },
+    "owner": "luludegex"
   }
 }
