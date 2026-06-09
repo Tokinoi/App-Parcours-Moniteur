@@ -1,3 +1,4 @@
+import "react-native-url-polyfill/auto";
 import {
   DarkTheme,
   DefaultTheme,
@@ -8,17 +9,27 @@ import { StatusBar } from "expo-status-bar";
 import { useColorScheme } from "react-native";
 import "react-native-reanimated";
 
+import { SessionProvider } from "@/context/session-context";
+
 export { ErrorBoundary } from "expo-router";
 
 export default function RootLayout() {
   const colorScheme = useColorScheme();
 
   return (
-    <ThemeProvider value={colorScheme === "dark" ? DarkTheme : DefaultTheme}>
-      <Stack screenOptions={{ headerShown: false }}>
-        <Stack.Screen name="(tabs)" />
-      </Stack>
-      <StatusBar style="auto" />
-    </ThemeProvider>
+    <SessionProvider>
+      <ThemeProvider value={colorScheme === "dark" ? DarkTheme : DefaultTheme}>
+        <Stack screenOptions={{ headerShown: false }}>
+          <Stack.Screen name="index" />
+          <Stack.Screen name="login" />
+          <Stack.Screen name="signup" />
+          <Stack.Screen name="home" />
+          <Stack.Screen name="profile" />
+          <Stack.Screen name="poi-status" />
+          <Stack.Screen name="favorites" />
+        </Stack>
+        <StatusBar style="light" />
+      </ThemeProvider>
+    </SessionProvider>
   );
 }

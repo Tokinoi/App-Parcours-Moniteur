@@ -1,7 +1,8 @@
 import { z } from "zod";
 
 const envSchema = z.object({
-  EXPO_PUBLIC_API_URL: z.string().url().optional(),
+  EXPO_PUBLIC_SUPABASE_URL: z.string().url().optional(),
+  EXPO_PUBLIC_SUPABASE_ANON_KEY: z.string().min(1).optional(),
   EXPO_PUBLIC_APP_ENV: z
     .enum(["development", "preview", "production"])
     .optional(),
@@ -14,8 +15,7 @@ function normalizeOrigin(value: string) {
 }
 
 export const appConfig = {
-  apiOrigin: normalizeOrigin(
-    parsedEnv.EXPO_PUBLIC_API_URL ?? "http://127.0.0.1:3000",
-  ),
+  supabaseUrl: normalizeOrigin(parsedEnv.EXPO_PUBLIC_SUPABASE_URL ?? ""),
+  supabaseAnonKey: parsedEnv.EXPO_PUBLIC_SUPABASE_ANON_KEY ?? "",
   environment: parsedEnv.EXPO_PUBLIC_APP_ENV ?? "development",
 } as const;
