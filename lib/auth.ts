@@ -78,3 +78,15 @@ export async function getCurrentUser(): Promise<UserProfile> {
   if (error || !data.user) throw new Error(error?.message ?? "Unable to load current user");
   return mapSupabaseUser(data.user);
 }
+
+export async function updateProfile(fields: {
+  firstName: string;
+  lastName: string;
+}): Promise<UserProfile> {
+  const { data, error } = await supabase.auth.updateUser({
+    data: { first_name: fields.firstName, last_name: fields.lastName },
+  });
+  if (error) throw new Error(error.message);
+  if (!data.user) throw new Error("Mise à jour échouée");
+  return mapSupabaseUser(data.user);
+}

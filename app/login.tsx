@@ -11,6 +11,7 @@ import {
   View,
 } from "react-native";
 
+import { uiKit } from "@/constants/Colors";
 import { useSession } from "@/context/session-context";
 
 export default function LoginScreen() {
@@ -79,7 +80,7 @@ export default function LoginScreen() {
             keyboardType="email-address"
             onChangeText={setEmail}
             placeholder="Email"
-            placeholderTextColor="#64748b"
+            placeholderTextColor={uiKit.text.muted}
             style={styles.input}
             value={email}
           />
@@ -88,7 +89,7 @@ export default function LoginScreen() {
             autoCorrect={false}
             onChangeText={setPassword}
             placeholder="Mot de passe"
-            placeholderTextColor="#64748b"
+            placeholderTextColor={uiKit.text.muted}
             secureTextEntry
             style={styles.input}
             value={password}
@@ -104,7 +105,7 @@ export default function LoginScreen() {
             ]}
           >
             <Text style={styles.primaryButtonLabel}>
-              {busy ? "Connexion…" : "Entrer dans l’app"}
+              {busy ? "Connexion…" : "Entrer dans l'app"}
             </Text>
           </Pressable>
 
@@ -127,7 +128,7 @@ export default function LoginScreen() {
 const styles = StyleSheet.create({
   screen: {
     flex: 1,
-    backgroundColor: "#07111f",
+    backgroundColor: uiKit.palette.night,
   },
   content: {
     flexGrow: 1,
@@ -142,7 +143,7 @@ const styles = StyleSheet.create({
     width: 180,
     height: 180,
     borderRadius: 180,
-    backgroundColor: "rgba(45, 212, 191, 0.16)",
+    backgroundColor: uiKit.gradients.glowA,
   },
   glowB: {
     position: "absolute",
@@ -151,49 +152,49 @@ const styles = StyleSheet.create({
     width: 160,
     height: 160,
     borderRadius: 160,
-    backgroundColor: "rgba(249, 115, 22, 0.14)",
+    backgroundColor: uiKit.gradients.glowB,
   },
   hero: {
     gap: 10,
   },
   badge: {
-    color: "#2dd4bf",
+    color: uiKit.palette.sky,
     textTransform: "uppercase",
     letterSpacing: 1.8,
     fontSize: 11,
     fontWeight: "800",
   },
   title: {
-    color: "#f8fafc",
+    color: uiKit.palette.white,
     fontSize: 38,
     lineHeight: 42,
     fontWeight: "900",
   },
   subtitle: {
-    color: "#cbd5e1",
+    color: uiKit.text.secondary,
     fontSize: 15,
     lineHeight: 22,
     maxWidth: 340,
   },
   card: {
-    backgroundColor: "rgba(15, 23, 42, 0.92)",
-    borderColor: "rgba(148, 163, 184, 0.16)",
+    backgroundColor: uiKit.surfaces.cardStrong,
+    borderColor: uiKit.surfaces.border,
     borderWidth: 1,
     borderRadius: 28,
     padding: 18,
     gap: 12,
   },
   cardLabel: {
-    color: "#f59e0b",
+    color: uiKit.palette.sun,
     textTransform: "uppercase",
     letterSpacing: 1.4,
     fontSize: 11,
     fontWeight: "800",
   },
   input: {
-    backgroundColor: "#020817",
-    color: "#f8fafc",
-    borderColor: "rgba(148, 163, 184, 0.22)",
+    backgroundColor: uiKit.surfaces.inputBackground,
+    color: uiKit.palette.white,
+    borderColor: uiKit.surfaces.border,
     borderWidth: 1,
     borderRadius: 18,
     paddingHorizontal: 14,
@@ -201,14 +202,14 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
   primaryButton: {
-    backgroundColor: "#2dd4bf",
+    backgroundColor: uiKit.actions.primary,
     borderRadius: 18,
     minHeight: 54,
     alignItems: "center",
     justifyContent: "center",
   },
   primaryButtonLabel: {
-    color: "#05201d",
+    color: uiKit.palette.night,
     fontSize: 16,
     fontWeight: "900",
   },
@@ -220,7 +221,7 @@ const styles = StyleSheet.create({
     opacity: 0.6,
   },
   message: {
-    color: "#e2e8f0",
+    color: uiKit.text.secondary,
     fontSize: 14,
     lineHeight: 20,
   },
@@ -231,11 +232,11 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   footerText: {
-    color: "#94a3b8",
+    color: uiKit.text.muted,
     fontSize: 14,
   },
   footerLink: {
-    color: "#f59e0b",
+    color: uiKit.palette.sun,
     fontSize: 14,
     fontWeight: "800",
   },

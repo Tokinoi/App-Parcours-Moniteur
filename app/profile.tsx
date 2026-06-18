@@ -1,10 +1,19 @@
 import { useRouter } from "expo-router";
 import { useEffect, useState } from "react";
-import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
+import {
+  Alert,
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TextInput,
+  View,
+} from "react-native";
 
 import { ProtectedScreen } from "@/components/ProtectedScreen";
+import { uiKit } from "@/constants/Colors";
 import { useSession } from "@/context/session-context";
-import { getCurrentUser } from "@/lib/auth";
+import { getCurrentUser, updateProfile } from "@/lib/auth";
 import type { UserProfile } from "@/lib/types";
 
 export default function ProfileScreen() {
@@ -19,7 +28,10 @@ function ProfileContent() {
   const router = useRouter();
   const { user } = useSession();
   const [profile, setProfile] = useState<UserProfile | null>(user);
-  const [status, setStatus] = useState("Profil issu de Supabase.");
+  const [firstName, setFirstName] = useState(user?.first_name ?? "");
+  const [lastName, setLastName] = useState(user?.last_name ?? "");
+  const [editing, setEditing] = useState(false);
+  const [saving, setSaving] = useState(false);
 
   useEffect(() => {
     let active = true;
@@ -29,13 +41,10 @@ function ProfileContent() {
         const data = await getCurrentUser();
         if (active) {
           setProfile(data);
-          setStatus("Profil synchronisé avec Supabase.");
+          setFirstName(data.first_name ?? "");
+          setLastName(data.last_name ?? "");
         }
-      } catch (error) {
-        if (active && error instanceof Error) {
-          setStatus(error.message);
-        }
-      }
+      } catch {}
     }
 
     void loadProfile();
@@ -45,100 +54,204 @@ function ProfileContent() {
     };
   }, []);
 
+  function handleCancel() {
+    setFirstName(profile?.first_name ?? "");
+    setLastName(profile?.last_name ?? "");
+    setEditing(false);
+  }
+
+  async function handleSave() {
+    setSaving(true);
+    try {
+      const updated = await updateProfile({
+        firstName: firstName.trim(),
+        lastName: lastName.trim(),
+      });
+      setProfile(updated);
+      setEditing(false);
+    } catch (error) {
+      Alert.alert(
+        "Erreur",
+        error instanceof Error ? error.message : "Mise à jour impossible.",
+      );
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  const hasChanges =
+    firstName.trim() !== (profile?.first_name ?? "") ||
+    lastName.trim() !== (profile?.last_name ?? "");
+
   return (
     <ScrollView style={styles.screen} contentContainerStyle={styles.content}>
+      <Pressable
+        onPress={() => router.back()}
+        style={({ pressed }) => [styles.backRow, pressed && styles.pressed]}
+      >
+        <Text style={styles.backArrow}>←</Text>
+        <Text style={styles.backLabel}>Retour à la carte</Text>
+      </Pressable>
+
       <Text style={styles.kicker}>Profil</Text>
       <Text style={styles.title}>Votre identité moniteur</Text>
-      <Text style={styles.subtitle}>{status}</Text>
 
       <View style={styles.card}>
-        <LabelValue label="Email" value={profile?.email ?? "Non disponible"} />
-        <LabelValue
-          label="Nom"
-          value={
-            [profile?.first_name, profile?.last_name]
-              .filter(Boolean)
-              .join(" ") || "Non renseigné"
-          }
-        />
-        <LabelValue label="Admin" value={profile?.is_admin ? "Oui" : "Non"} />
+        <View style={styles.fieldGroup}>
+          <Text style={styles.label}>Email</Text>
+          <Text style={styles.value}>{profile?.email ?? "Non disponible"}</Text>
+        </View>
+
+        <View style={styles.fieldGroup}>
+          <Text style={styles.label}>Prénom</Text>
+          {editing ? (
+            <TextInput
+              style={styles.input}
+              value={firstName}
+              onChangeText={setFirstName}
+              placeholder="Prénom"
+              placeholderTextColor={uiKit.text.muted}
+              autoCapitalize="words"
+            />
+          ) : (
+            <Text style={styles.value}>{profile?.first_name || "Non renseigné"}</Text>
+          )}
+        </View>
+
+        <View style={styles.fieldGroup}>
+          <Text style={styles.label}>Nom</Text>
+          {editing ? (
+            <TextInput
+              style={styles.input}
+              value={lastName}
+              onChangeText={setLastName}
+              placeholder="Nom"
+              placeholderTextColor={uiKit.text.muted}
+              autoCapitalize="words"
+            />
+          ) : (
+            <Text style={styles.value}>{profile?.last_name || "Non renseigné"}</Text>
+          )}
+        </View>
+
+        <View style={styles.fieldGroup}>
+          <Text style={styles.label}>Admin</Text>
+          <Text style={styles.value}>{profile?.is_admin ? "Oui" : "Non"}</Text>
+        </View>
       </View>
 
-      <View style={styles.actionRow}>
-        <Pressable onPress={() => router.back()} style={styles.secondaryButton}>
-          <Text style={styles.secondaryButtonText}>Retour</Text>
-        </Pressable>
+      {editing ? (
+        <View style={styles.actionRow}>
+          <Pressable
+            onPress={handleCancel}
+            style={({ pressed }) => [styles.secondaryButton, pressed && styles.pressed]}
+          >
+            <Text style={styles.secondaryButtonText}>Annuler</Text>
+          </Pressable>
+          <Pressable
+            onPress={() => void handleSave()}
+            disabled={saving || !hasChanges}
+            style={({ pressed }) => [
+              styles.primaryButton,
+              (saving || !hasChanges) && styles.disabled,
+              pressed && styles.pressed,
+            ]}
+          >
+            <Text style={styles.primaryButtonText}>
+              {saving ? "Enregistrement…" : "Enregistrer"}
+            </Text>
+          </Pressable>
+        </View>
+      ) : (
         <Pressable
-          onPress={() => router.push("/home" as never)}
-          style={styles.primaryButton}
+          onPress={() => setEditing(true)}
+          style={({ pressed }) => [styles.editButton, pressed && styles.pressed]}
         >
-          <Text style={styles.primaryButtonText}>Ouvrir la carte</Text>
+          <Text style={styles.editButtonText}>Modifier le profil</Text>
         </Pressable>
-      </View>
+      )}
     </ScrollView>
-  );
-}
-
-function LabelValue({ label, value }: { label: string; value: string }) {
-  return (
-    <View style={styles.labelRow}>
-      <Text style={styles.label}>{label}</Text>
-      <Text style={styles.value}>{value}</Text>
-    </View>
   );
 }
 
 const styles = StyleSheet.create({
   screen: {
     flex: 1,
-    backgroundColor: "#07111f",
+    backgroundColor: uiKit.palette.night,
   },
   content: {
     padding: 18,
     gap: 14,
     paddingTop: 52,
+    paddingBottom: 48,
   },
+
+  backRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
+    marginBottom: 4,
+  },
+  backArrow: {
+    color: uiKit.palette.sky,
+    fontSize: 18,
+    fontWeight: "900",
+  },
+  backLabel: {
+    color: uiKit.palette.sky,
+    fontSize: 14,
+    fontWeight: "700",
+  },
+
   kicker: {
-    color: "#2dd4bf",
+    color: uiKit.palette.sky,
     textTransform: "uppercase",
     letterSpacing: 1.4,
     fontSize: 11,
     fontWeight: "800",
   },
   title: {
-    color: "#f8fafc",
+    color: uiKit.palette.white,
     fontSize: 30,
     lineHeight: 34,
     fontWeight: "900",
   },
-  subtitle: {
-    color: "#cbd5e1",
-    fontSize: 14,
-    lineHeight: 21,
-  },
+
   card: {
-    backgroundColor: "#0f172a",
+    backgroundColor: uiKit.surfaces.cardStrong,
     borderRadius: 26,
     padding: 18,
-    gap: 12,
+    gap: 16,
     borderWidth: 1,
-    borderColor: "rgba(148, 163, 184, 0.15)",
+    borderColor: uiKit.surfaces.border,
   },
-  labelRow: {
+  fieldGroup: {
     gap: 4,
   },
   label: {
-    color: "#94a3b8",
+    color: uiKit.text.muted,
     textTransform: "uppercase",
     letterSpacing: 1,
     fontSize: 10,
     fontWeight: "800",
   },
   value: {
-    color: "#f8fafc",
+    color: uiKit.palette.white,
     fontSize: 15,
     fontWeight: "800",
   },
+  input: {
+    color: uiKit.palette.white,
+    fontSize: 15,
+    fontWeight: "800",
+    backgroundColor: uiKit.surfaces.cardBackground,
+    borderWidth: 1,
+    borderColor: uiKit.palette.sky,
+    borderRadius: 12,
+    paddingHorizontal: 14,
+    paddingVertical: 10,
+  },
+
   actionRow: {
     flexDirection: "row",
     gap: 10,
@@ -149,12 +262,12 @@ const styles = StyleSheet.create({
     borderRadius: 18,
     alignItems: "center",
     justifyContent: "center",
-    backgroundColor: "#020817",
+    backgroundColor: uiKit.surfaces.cardBackground,
     borderWidth: 1,
-    borderColor: "rgba(148, 163, 184, 0.18)",
+    borderColor: uiKit.surfaces.border,
   },
   secondaryButtonText: {
-    color: "#f8fafc",
+    color: uiKit.palette.white,
     fontWeight: "800",
   },
   primaryButton: {
@@ -163,10 +276,27 @@ const styles = StyleSheet.create({
     borderRadius: 18,
     alignItems: "center",
     justifyContent: "center",
-    backgroundColor: "#2dd4bf",
+    backgroundColor: uiKit.actions.primary,
   },
   primaryButtonText: {
-    color: "#05201d",
+    color: uiKit.palette.night,
     fontWeight: "900",
   },
+  editButton: {
+    minHeight: 54,
+    borderRadius: 18,
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: uiKit.actions.secondary,
+    borderWidth: 1,
+    borderColor: "rgba(93, 217, 250, 0.4)",
+  },
+  editButtonText: {
+    color: uiKit.palette.white,
+    fontSize: 15,
+    fontWeight: "900",
+  },
+
+  disabled: { opacity: 0.45 },
+  pressed: { opacity: 0.82, transform: [{ scale: 0.98 }] },
 });

@@ -29,3 +29,18 @@ export type Poi = {
   category: string;
   status: string;
 };
+
+export type ParcoursStep = {
+  poi: Poi;
+  orderIndex: number;
+  instruction: string;
+};
+
+export type Parcours = {
+  id: string;
+  name: string;
+  description: string;
+  skill: string;
+  durationMinutes: number;
+  steps: ParcoursStep[];
+};
