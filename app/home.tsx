@@ -10,7 +10,7 @@ import {
   Text,
   View,
 } from "react-native";
-import MapView, { Marker, Polyline, UrlTile } from "react-native-maps";
+import MapView, { Marker, Polyline } from "react-native-maps";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { ProtectedScreen } from "@/components/ProtectedScreen";
@@ -372,12 +372,6 @@ function HomeContent() {
           }
         }}
       >
-        <UrlTile
-          urlTemplate="https://tile.openstreetmap.org/{z}/{x}/{y}.png"
-          maximumZ={19}
-          flipY={false}
-        />
-
         {/* Parcours mode: numbered markers */}
         {inParcours
           ? activeParcours.steps.map((step, i) => {
@@ -412,38 +406,39 @@ function HomeContent() {
                 </Marker>
               );
             })
-          : poiList.map((poi) => (
-              <Marker
-                key={`${poi.id}-${selectedPoiId === poi.id ? "sel" : "def"}`}
-                coordinate={{
-                  latitude: poi.latitude,
-                  longitude: poi.longitude,
-                }}
-                title={poi.name}
-                description={poi.status}
-                onPress={() => {
-                  setSelectedPoiId(poi.id);
-                  mapRef.current?.animateToRegion(
-                    {
-                      latitude: poi.latitude,
-                      longitude: poi.longitude,
-                      latitudeDelta: 0.006,
-                      longitudeDelta: 0.006,
-                    },
-                    500,
-                  );
-                }}
-              >
-                <Image
-                  source={poiIcon}
-                  style={[
-                    styles.markerIcon,
-                    selectedPoiId === poi.id && styles.markerIconSelected,
-                  ]}
-                  resizeMode="contain"
-                />
-              </Marker>
-            ))}
+          : poiList.map((poi) => {
+              const isSelected = selectedPoiId === poi.id;
+              return (
+                <Marker
+                  key={poi.id}
+                  coordinate={{
+                    latitude: poi.latitude,
+                    longitude: poi.longitude,
+                  }}
+                  title={poi.name}
+                  description={poi.status}
+                  tracksViewChanges={isSelected}
+                  onPress={() => {
+                    setSelectedPoiId(poi.id);
+                    mapRef.current?.animateToRegion(
+                      {
+                        latitude: poi.latitude,
+                        longitude: poi.longitude,
+                        latitudeDelta: 0.006,
+                        longitudeDelta: 0.006,
+                      },
+                      500,
+                    );
+                  }}
+                >
+                  <Image
+                    source={poiIcon}
+                    style={isSelected ? styles.markerIconSelected : styles.markerIcon}
+                    resizeMode="contain"
+                  />
+                </Marker>
+              );
+            })}
 
         {/* Route polyline */}
         {inParcours && parcoursPolyline.length > 1 && (
@@ -478,7 +473,7 @@ function HomeContent() {
 
       {/* Normal mode bottom */}
       {normalMode && (
-        <View style={styles.bottomHintCard}>
+        <View style={[styles.bottomHintCard, { bottom: 88 + insets.bottom }]}>
           <Text style={styles.cardTitle}>Prêt pour la vadrouille</Text>
           <Text style={styles.cardLine}>
             Démarrez un parcours d'apprentissage ou posez un POI librement.
@@ -491,6 +486,7 @@ function HomeContent() {
           onPress={() => void refocusOnCurrentLocation()}
           style={({ pressed }) => [
             styles.refocusButton,
+            { bottom: 18 + insets.bottom },
             pressed && styles.pressed,
           ]}
         >
@@ -503,6 +499,7 @@ function HomeContent() {
           onPress={() => void enterVadrouilleMode()}
           style={({ pressed }) => [
             styles.startVadrouille,
+            { bottom: 18 + insets.bottom },
             pressed && styles.pressed,
           ]}
         >
@@ -512,7 +509,7 @@ function HomeContent() {
 
       {/* Vadrouille panel */}
       {exploreMode && (
-        <View style={styles.vadrouilleBottomSection}>
+        <View style={[styles.vadrouilleBottomSection, { paddingBottom: 32 + insets.bottom }]}>
           <Pressable
             onPress={() => setExploreMode(false)}
             style={({ pressed }) => [styles.exitBar, pressed && styles.pressed]}
@@ -592,7 +589,7 @@ function HomeContent() {
           const step = activeParcours.steps[currentStepIndex];
           const isLast = currentStepIndex === activeParcours.steps.length - 1;
           return (
-            <View style={styles.parcoursPanel}>
+            <View style={[styles.parcoursPanel, { paddingBottom: 32 + insets.bottom }]}>
               <View style={styles.parcoursHeaderRow}>
                 <View style={styles.parcoursStepBadge}>
                   <Text style={styles.parcoursStepBadgeText}>
@@ -862,7 +859,6 @@ const styles = StyleSheet.create({
     position: "absolute",
     left: 18,
     right: 18,
-    bottom: 88,
     zIndex: 15,
     borderRadius: 28,
     backgroundColor: uiKit.surfaces.cardStrong,
@@ -884,7 +880,6 @@ const styles = StyleSheet.create({
   refocusButton: {
     position: "absolute",
     left: 18,
-    bottom: 18,
     zIndex: 22,
     minHeight: 46,
     paddingHorizontal: 18,
@@ -903,7 +898,6 @@ const styles = StyleSheet.create({
   startVadrouille: {
     position: "absolute",
     right: 18,
-    bottom: 18,
     zIndex: 22,
     minHeight: 50,
     paddingHorizontal: 22,
@@ -935,7 +929,6 @@ const styles = StyleSheet.create({
     borderTopWidth: 1,
     borderColor: uiKit.surfaces.border,
     padding: 20,
-    paddingBottom: 32,
     gap: 16,
   },
   exitBar: {
@@ -1009,7 +1002,6 @@ const styles = StyleSheet.create({
     borderTopWidth: 1,
     borderColor: uiKit.surfaces.border,
     padding: 20,
-    paddingBottom: 32,
     gap: 14,
   },
   parcoursHeaderRow: {
