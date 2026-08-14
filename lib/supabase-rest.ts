@@ -1,5 +1,5 @@
 import { supabase } from "@/lib/supabase";
-import { sampleParcours } from "@/lib/sample-data";
+import { buildSharedTrainings } from "@/lib/training-engine";
 import type { Parcours, ParcoursStep, Poi } from "@/lib/types";
 
 type PoiRow = {
@@ -86,37 +86,12 @@ type ParcoursRow = {
 };
 
 export async function fetchParcours(): Promise<Parcours[]> {
-  const { data, error } = await supabase
-    .from("parcours")
-    .select(
-      `id, name, description, skill, duration_minutes,
-       parcours_pois(order_index, instruction, pois(id, name, description, type, status, latitude, longitude))`,
-    )
-    .order("created_at", { ascending: true });
+  const pois = await fetchActivePois();
 
-  if (error) {
-    // Fall back to offline sample data when Supabase parcours tables aren't set up yet.
-    return sampleParcours;
-  }
-  if (!data || data.length === 0) return sampleParcours;
-
-  return (data as unknown as ParcoursRow[]).map((row) => ({
-    id: row.id,
-    name: row.name,
-    description: row.description ?? "",
-    skill: row.skill,
-    durationMinutes: row.duration_minutes,
-    steps: row.parcours_pois
-      .sort((a, b) => a.order_index - b.order_index)
-      .map((pp): ParcoursStep => {
-        const poiData = Array.isArray(pp.pois) ? pp.pois[0] : pp.pois;
-        return {
-          poi: mapPoi(poiData),
-          orderIndex: pp.order_index,
-          instruction: pp.instruction ?? "",
-        };
-      }),
-  }));
+  return buildSharedTrainings({
+    pois,
+    origin: { latitude: 45.7579, longitude: 4.832 },
+  });
 }
 
 export async function fetchFavoritePois(input: { userId: string }) {

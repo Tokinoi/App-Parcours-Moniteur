@@ -23,7 +23,6 @@ import {
   haversineDistance,
   type LatLon,
 } from "@/lib/routing";
-import { samplePois } from "@/lib/sample-data";
 import { createVadrouillePoi, fetchAllPois } from "@/lib/supabase-rest";
 import type { Poi } from "@/lib/types";
 
@@ -68,7 +67,7 @@ function HomeContent() {
   const [exploreMode, setExploreMode] = useState(false);
   const insets = useSafeAreaInsets();
   const [currentPosition, setCurrentPosition] = useState(defaultRegion);
-  const [poiList, setPoiList] = useState<Poi[]>(samplePois);
+  const [poiList, setPoiList] = useState<Poi[]>([]);
   const [apiState, setApiState] = useState("Connexion Supabase en cours…");
   const [isCreatingPoi, setIsCreatingPoi] = useState(false);
   const [poiAdded, setPoiAdded] = useState(false);
@@ -225,9 +224,13 @@ function HomeContent() {
   async function loadPois() {
     try {
       const pois = await fetchAllPois();
-      if (Array.isArray(pois) && pois.length > 0) {
+      if (Array.isArray(pois)) {
         setPoiList(pois);
-        setApiState("L'outils des moniteurs d'auto-école.");
+        setApiState(
+          pois.length > 0
+            ? "L'outils des moniteurs d'auto-école."
+            : "Aucun POI actif disponible pour le moment.",
+        );
       }
     } catch (error) {
       setApiState(

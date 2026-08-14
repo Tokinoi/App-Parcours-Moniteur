@@ -5,7 +5,6 @@ import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import { ProtectedScreen } from "@/components/ProtectedScreen";
 import { uiKit } from "@/constants/Colors";
 import { useSession } from "@/context/session-context";
-import { samplePois } from "@/lib/sample-data";
 import {
   addFavorite,
   fetchAllPois,
@@ -25,7 +24,7 @@ export default function PoiStatusScreen() {
 function PoiStatusContent() {
   const router = useRouter();
   const { user } = useSession();
-  const [pois, setPois] = useState<Poi[]>(samplePois);
+  const [pois, setPois] = useState<Poi[]>([]);
   const [favoriteIds, setFavoriteIds] = useState<Set<string>>(new Set());
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
@@ -35,7 +34,12 @@ function PoiStatusContent() {
     async function load() {
       try {
         const data = await fetchAllPois();
-        if (active && Array.isArray(data)) setPois(data);
+        if (active && Array.isArray(data)) {
+          setPois(data);
+          if (data.length === 0) {
+            setErrorMessage("Aucun POI actif disponible pour le moment.");
+          }
+        }
       } catch (error) {
         if (active)
           setErrorMessage(

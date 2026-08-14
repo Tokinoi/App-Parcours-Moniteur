@@ -43,4 +43,39 @@ export type Parcours = {
   skill: string;
   durationMinutes: number;
   steps: ParcoursStep[];
+  mode?: "session" | "shared";
+  exerciseTypes?: string[];
+  originLabel?: string;
+  shareable?: boolean;
+};
+
+export type TrainingFocus =
+  | "Giratoires"
+  | "Priorités à droite"
+  | "Conduite urbaine"
+  | "Carrefours à feux"
+  | "Stationnement"
+  | "Mixte";
+
+export type TrainingMode = "session" | "shared";
+
+export type TrainingPreset = {
+  id: string;
+  name: string;
+  description: string;
+  focus: TrainingFocus;
+  durationMinutes: number;
+  exerciseTypes: string[];
+  shareable: boolean;
+};
+
+export type TrainingGenerationInput = {
+  pois: Poi[];
+  origin: { latitude: number; longitude: number };
+  focus: TrainingFocus;
+  durationMinutes: number;
+  mode: TrainingMode;
+  name: string;
+  description: string;
+  shareable?: boolean;
 };
