@@ -1,6 +1,7 @@
 {
   "cli": {
-    "version": ">= 16.12.0"
+    "version": ">= 16.12.0",
+    "appVersionSource": "remote"
   },
   "build": {
     "development": {
@@ -11,6 +12,7 @@
       "distribution": "internal"
     },
     "production": {
+      "autoIncrement": true,
       "android": {
         "buildType": "app-bundle"
       }
@@ -20,6 +22,9 @@
     "production": {
       "android": {
         "serviceAccountKeyPath": "./secrets/google-play-service-account.json"
+      },
+      "ios": {
+        "ascAppId": "6781720590"
       }
     }
   }
