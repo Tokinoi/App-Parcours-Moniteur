@@ -62,11 +62,14 @@ function ParcoursContent() {
   const [origin, setOrigin] = useState(DEFAULT_ORIGIN);
   const [locationLabel, setLocationLabel] = useState("Localisation par défaut");
   const [mode, setMode] = useState<TrainingMode>("session");
-  const [selectedFocus, setSelectedFocus] = useState<TrainingFocus>("Giratoires");
+  const [selectedFocus, setSelectedFocus] =
+    useState<TrainingFocus>("Giratoires");
   const [selectedDuration, setSelectedDuration] = useState(30);
   const [loading, setLoading] = useState(true);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
-  const locationSubscription = useRef<Location.LocationSubscription | null>(null);
+  const locationSubscription = useRef<Location.LocationSubscription | null>(
+    null,
+  );
   const refreshTimerRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   useEffect(() => {
@@ -82,9 +85,7 @@ function ParcoursContent() {
 
       setPois(poisData);
       setErrorMessage(
-        poisData.length > 0
-          ? null
-          : "Aucun POI actif trouvé dans Supabase.",
+        poisData.length > 0 ? null : "Aucun POI actif trouvé dans Supabase.",
       );
 
       return poisData;
@@ -127,28 +128,26 @@ function ParcoursContent() {
         await loadLocation();
 
         if (permissionGranted) {
-          locationSubscription.current = (
-            await Location.watchPositionAsync(
-              {
-                accuracy: Location.Accuracy.Balanced,
-                distanceInterval: 15,
-                timeInterval: 10000,
-              },
-              (location) => {
-                if (!active) {
-                  return;
-                }
+          locationSubscription.current = await Location.watchPositionAsync(
+            {
+              accuracy: Location.Accuracy.Balanced,
+              distanceInterval: 15,
+              timeInterval: 10000,
+            },
+            (location) => {
+              if (!active) {
+                return;
+              }
 
-                const nextOrigin = {
-                  latitude: location.coords.latitude,
-                  longitude: location.coords.longitude,
-                };
-                setOrigin(nextOrigin);
-                setLocationLabel(
-                  `Autour de ${nextOrigin.latitude.toFixed(4)}, ${nextOrigin.longitude.toFixed(4)}`,
-                );
-              },
-            )
+              const nextOrigin = {
+                latitude: location.coords.latitude,
+                longitude: location.coords.longitude,
+              };
+              setOrigin(nextOrigin);
+              setLocationLabel(
+                `Autour de ${nextOrigin.latitude.toFixed(4)}, ${nextOrigin.longitude.toFixed(4)}`,
+              );
+            },
           );
         }
 
@@ -222,7 +221,9 @@ function ParcoursContent() {
     } catch (error) {
       Alert.alert(
         "Partage impossible",
-        error instanceof Error ? error.message : "Impossible de partager ce parcours.",
+        error instanceof Error
+          ? error.message
+          : "Impossible de partager ce parcours.",
       );
     }
   }
@@ -238,9 +239,12 @@ function ParcoursContent() {
       </Pressable>
 
       <Text style={styles.kicker}>Parcours terrain</Text>
-      <Text style={styles.title}>Session personnalisée ou parcours partageable</Text>
+      <Text style={styles.title}>
+        Session personnalisée ou parcours partageable
+      </Text>
       <Text style={styles.subtitle}>
-        Le moteur compose des parcours à partir des POIs actifs de Supabase, de votre position actuelle et du type d'exercice recherché.
+        Le moteur compose des parcours à partir des POIs actifs de Supabase, de
+        votre position actuelle et du type d'exercice recherché.
       </Text>
 
       <View style={styles.segmentedControl}>
@@ -260,7 +264,8 @@ function ParcoursContent() {
         <Text style={styles.locationKicker}>Localisation actuelle</Text>
         <Text style={styles.locationValue}>{locationLabel}</Text>
         <Text style={styles.locationHint}>
-          Les suggestions sont triées selon la distance à votre position et la cohérence avec le type d'exercice.
+          Les suggestions sont triées selon la distance à votre position et la
+          cohérence avec le type d'exercice.
         </Text>
       </View>
 
@@ -311,7 +316,9 @@ function ParcoursContent() {
               />
             ) : (
               <Text style={styles.emptyText}>
-                Aucun parcours n'a pu être généré avec les POIs disponibles. Pour un focus giratoires, il faut au moins trois POIs actifs qui mentionnent un rond-point, un giratoire ou une bretelle.
+                Aucun parcours n'a pu être généré avec les POIs disponibles.
+                Pour un focus giratoires, il faut au moins trois POIs actifs qui
+                mentionnent un rond-point, un giratoire ou une bretelle.
               </Text>
             )}
           </View>
@@ -320,7 +327,8 @@ function ParcoursContent() {
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Parcours partageables</Text>
           <Text style={styles.sectionSubtitle}>
-            Triés par durée, type d'exercices puis proximité à votre position actuelle.
+            Triés par durée, type d'exercices puis proximité à votre position
+            actuelle.
           </Text>
 
           <View style={styles.list}>
@@ -336,7 +344,8 @@ function ParcoursContent() {
 
             {sharedTrainings.length === 0 && !loading && (
               <Text style={styles.emptyText}>
-                Aucun parcours partageable n'a pu être composé à partir des POIs actifs.
+                Aucun parcours partageable n'a pu être composé à partir des POIs
+                actifs.
               </Text>
             )}
           </View>
@@ -364,7 +373,14 @@ function SegmentButton({
         pressed && styles.pressed,
       ]}
     >
-      <Text style={[styles.segmentButtonLabel, active && styles.segmentButtonLabelActive]}>{label}</Text>
+      <Text
+        style={[
+          styles.segmentButtonLabel,
+          active && styles.segmentButtonLabelActive,
+        ]}
+      >
+        {label}
+      </Text>
     </Pressable>
   );
 }
@@ -390,7 +406,11 @@ function FilterChip({
         pressed && styles.pressed,
       ]}
     >
-      <Text style={[styles.filterChipLabel, active && styles.filterChipLabelActive]}>{label}</Text>
+      <Text
+        style={[styles.filterChipLabel, active && styles.filterChipLabelActive]}
+      >
+        {label}
+      </Text>
     </Pressable>
   );
 }
@@ -411,8 +431,15 @@ function TrainingCard({
   return (
     <View style={styles.card}>
       <View style={styles.cardHeader}>
-        <View style={[styles.skillBadge, { backgroundColor: `${color}22`, borderColor: `${color}55` }]}>
-          <Text style={[styles.skillBadgeText, { color }]}>{parcours.skill}</Text>
+        <View
+          style={[
+            styles.skillBadge,
+            { backgroundColor: `${color}22`, borderColor: `${color}55` },
+          ]}
+        >
+          <Text style={[styles.skillBadgeText, { color }]}>
+            {parcours.skill}
+          </Text>
         </View>
         <View style={styles.metaRow}>
           <Text style={styles.metaItem}>⏱ {parcours.durationMinutes} min</Text>
@@ -434,7 +461,9 @@ function TrainingCard({
 
       <View style={styles.metaLine}>
         <Text style={styles.metaLineLabel}>Départ</Text>
-        <Text style={styles.metaLineValue}>{parcours.originLabel ?? "Localisation courante"}</Text>
+        <Text style={styles.metaLineValue}>
+          {parcours.originLabel ?? "Localisation courante"}
+        </Text>
       </View>
 
       <View style={styles.stepsPreview}>
@@ -453,7 +482,10 @@ function TrainingCard({
       <View style={styles.actionRow}>
         <Pressable
           onPress={() => onStart(parcours)}
-          style={({ pressed }) => [styles.startButton, pressed && styles.pressed]}
+          style={({ pressed }) => [
+            styles.startButton,
+            pressed && styles.pressed,
+          ]}
         >
           <Text style={styles.startButtonLabel}>Démarrer</Text>
         </Pressable>
@@ -461,7 +493,10 @@ function TrainingCard({
         {showShare && parcours.shareable && (
           <Pressable
             onPress={() => onShare(parcours)}
-            style={({ pressed }) => [styles.shareButton, pressed && styles.pressed]}
+            style={({ pressed }) => [
+              styles.shareButton,
+              pressed && styles.pressed,
+            ]}
           >
             <Text style={styles.shareButtonLabel}>Partager</Text>
           </Pressable>

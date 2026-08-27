@@ -117,7 +117,9 @@ function PoiStatusContent() {
                     pressed && styles.pressed,
                   ]}
                 >
-                  <Text style={[styles.favHeart, isFav && styles.favHeartActive]}>
+                  <Text
+                    style={[styles.favHeart, isFav && styles.favHeartActive]}
+                  >
                     {isFav ? "♥" : "♡"}
                   </Text>
                 </Pressable>

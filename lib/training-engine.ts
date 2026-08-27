@@ -19,24 +19,39 @@ const FOCUS_CONFIG: Record<
 > = {
   Giratoires: {
     keywords: ["rond point", "rond-point", "giratoire", "bretelle"],
-    exerciseTypes: ["Prise d'information", "Placement de voie", "Cédez le passage"],
+    exerciseTypes: [
+      "Prise d'information",
+      "Placement de voie",
+      "Cédez le passage",
+    ],
     intro: "Travaillez la lecture des priorités et les sorties de giratoire.",
     strictMatch: true,
   },
   "Priorités à droite": {
     keywords: ["priorite", "priorité", "carrefour", "intersection", "stop"],
     exerciseTypes: ["Priorité à droite", "Observation", "Anticipation"],
-    intro: "Enchaînez les intersections pour gérer les priorités sans hésitation.",
+    intro:
+      "Enchaînez les intersections pour gérer les priorités sans hésitation.",
   },
   "Conduite urbaine": {
     keywords: ["centre", "zone dense", "urbain", "piéton", "bus", "tram"],
-    exerciseTypes: ["Gestion de flux", "Conscience des usagers", "Positionnement"],
-    intro: "Travaillez les flux urbains, les piétons et les croisements serrés.",
+    exerciseTypes: [
+      "Gestion de flux",
+      "Conscience des usagers",
+      "Positionnement",
+    ],
+    intro:
+      "Travaillez les flux urbains, les piétons et les croisements serrés.",
   },
   "Carrefours à feux": {
     keywords: ["feux", "carrefour", "intersection", "voie", "traversée"],
-    exerciseTypes: ["Démarrage au feu", "Anticipation", "Lecture de signalisation"],
-    intro: "Enchaînez les feux et les carrefours pour sécuriser vos phases d'approche.",
+    exerciseTypes: [
+      "Démarrage au feu",
+      "Anticipation",
+      "Lecture de signalisation",
+    ],
+    intro:
+      "Enchaînez les feux et les carrefours pour sécuriser vos phases d'approche.",
   },
   Stationnement: {
     keywords: ["stationnement", "livraison", "parking", "arrêt", "bordure"],
@@ -54,16 +69,22 @@ const SHARED_PRESETS: TrainingPreset[] = [
   {
     id: "shared-giratoires-20",
     name: "Giratoires express",
-    description: "Une boucle courte pour réviser les entrées, les voies et les sorties.",
+    description:
+      "Une boucle courte pour réviser les entrées, les voies et les sorties.",
     focus: "Giratoires",
     durationMinutes: 20,
-    exerciseTypes: ["Prise d'information", "Placement de voie", "Cédez le passage"],
+    exerciseTypes: [
+      "Prise d'information",
+      "Placement de voie",
+      "Cédez le passage",
+    ],
     shareable: true,
   },
   {
     id: "shared-priorites-30",
     name: "Priorités & intersections",
-    description: "Un format intermédiaire centré sur les priorités et les carrefours urbains.",
+    description:
+      "Un format intermédiaire centré sur les priorités et les carrefours urbains.",
     focus: "Priorités à droite",
     durationMinutes: 30,
     exerciseTypes: ["Priorité à droite", "Observation", "Anticipation"],
@@ -72,25 +93,36 @@ const SHARED_PRESETS: TrainingPreset[] = [
   {
     id: "shared-urbain-30",
     name: "Centre-ville dense",
-    description: "Idéal pour travailler le trafic urbain et les interactions avec les autres usagers.",
+    description:
+      "Idéal pour travailler le trafic urbain et les interactions avec les autres usagers.",
     focus: "Conduite urbaine",
     durationMinutes: 30,
-    exerciseTypes: ["Gestion de flux", "Conscience des usagers", "Positionnement"],
+    exerciseTypes: [
+      "Gestion de flux",
+      "Conscience des usagers",
+      "Positionnement",
+    ],
     shareable: true,
   },
   {
     id: "shared-feux-45",
     name: "Carrefours à feux",
-    description: "Une session plus longue pour enchaîner les phases de feu et les intersections.",
+    description:
+      "Une session plus longue pour enchaîner les phases de feu et les intersections.",
     focus: "Carrefours à feux",
     durationMinutes: 45,
-    exerciseTypes: ["Démarrage au feu", "Anticipation", "Lecture de signalisation"],
+    exerciseTypes: [
+      "Démarrage au feu",
+      "Anticipation",
+      "Lecture de signalisation",
+    ],
     shareable: true,
   },
   {
     id: "shared-stationnement-45",
     name: "Arrêts et stationnement",
-    description: "Pour réviser les arrêts sécurisés et les manoeuvres en contexte réel.",
+    description:
+      "Pour réviser les arrêts sécurisés et les manoeuvres en contexte réel.",
     focus: "Stationnement",
     durationMinutes: 45,
     exerciseTypes: ["Arrêt sécurisé", "Contrôle des angles morts", "Manoeuvre"],
@@ -99,7 +131,8 @@ const SHARED_PRESETS: TrainingPreset[] = [
   {
     id: "shared-mixte-60",
     name: "Parcours complet",
-    description: "La version la plus polyvalente, pensée pour travailler plusieurs familles d'exercices.",
+    description:
+      "La version la plus polyvalente, pensée pour travailler plusieurs familles d'exercices.",
     focus: "Mixte",
     durationMinutes: 60,
     exerciseTypes: ["Adaptation", "Anticipation", "Lecture globale"],
@@ -149,14 +182,24 @@ function proximityScore(from: LatLon, poi: Poi) {
   return clamp(120 - distance / 35, 0, 120);
 }
 
-function stepInstruction(focus: TrainingFocus, poi: Poi, stepIndex: number, stepCount: number) {
+function stepInstruction(
+  focus: TrainingFocus,
+  poi: Poi,
+  stepIndex: number,
+  stepCount: number,
+) {
   const config = FOCUS_CONFIG[focus];
   return `${stepIndex + 1}/${stepCount} - ${config.intro} Commencez par ${poi.name} puis observez ${poi.category.toLowerCase()} avant de valider votre trajectoire.`;
 }
 
 function buildParcours(input: TrainingGenerationInput): Parcours | null {
-  const uniquePois = input.pois.filter((poi, index, list) => list.findIndex((candidate) => candidate.id === poi.id) === index);
-  const candidatePois = uniquePois.filter((poi) => matchesStrictFocus(poi, input.focus));
+  const uniquePois = input.pois.filter(
+    (poi, index, list) =>
+      list.findIndex((candidate) => candidate.id === poi.id) === index,
+  );
+  const candidatePois = uniquePois.filter((poi) =>
+    matchesStrictFocus(poi, input.focus),
+  );
 
   if (candidatePois.length === 0) {
     return null;
@@ -176,7 +219,10 @@ function buildParcours(input: TrainingGenerationInput): Parcours | null {
   while (remaining.length > 0 && selected.length < desiredStepCount) {
     const ranked = remaining
       .map((poi) => {
-        const score = focusScore(poi, input.focus) + proximityScore(currentPoint, poi) + proximityScore(origin, poi) * 0.4;
+        const score =
+          focusScore(poi, input.focus) +
+          proximityScore(currentPoint, poi) +
+          proximityScore(origin, poi) * 0.4;
         return { poi, score };
       })
       .sort((left, right) => right.score - left.score);
@@ -186,7 +232,10 @@ function buildParcours(input: TrainingGenerationInput): Parcours | null {
       break;
     }
 
-    const travelCost = selected.length === 0 ? haversineDistance(origin, nextCandidate) : haversineDistance(currentPoint, nextCandidate);
+    const travelCost =
+      selected.length === 0
+        ? haversineDistance(origin, nextCandidate)
+        : haversineDistance(currentPoint, nextCandidate);
     if (selected.length >= 2 && routeBudget - travelCost < -250) {
       break;
     }
@@ -211,7 +260,10 @@ function buildParcours(input: TrainingGenerationInput): Parcours | null {
       .sort((left, right) => right.score - left.score)
       .map(({ poi }) => poi);
 
-    while (selected.length < Math.min(desiredStepCount, 3) && fallbackPool.length > 0) {
+    while (
+      selected.length < Math.min(desiredStepCount, 3) &&
+      fallbackPool.length > 0
+    ) {
       const nextPoi = fallbackPool.shift();
       if (!nextPoi) {
         break;
@@ -230,7 +282,8 @@ function buildParcours(input: TrainingGenerationInput): Parcours | null {
     orderIndex: index,
     instruction: stepInstruction(input.focus, poi, index, selected.length),
   }));
-  const sharedSuffix = input.mode === "shared" ? " partageable" : " personnalisé";
+  const sharedSuffix =
+    input.mode === "shared" ? " partageable" : " personnalisé";
 
   return {
     id: `${input.mode}-${input.focus}-${input.durationMinutes}-${selected.map((poi) => poi.id.slice(0, 8)).join("-")}`,
@@ -264,23 +317,19 @@ export function buildPersonalizedSession(input: {
   });
 }
 
-export function buildSharedTrainings(input: {
-  pois: Poi[];
-  origin: LatLon;
-}) {
-  return SHARED_PRESETS
-    .map((preset) =>
-      buildParcours({
-        pois: input.pois,
-        origin: input.origin,
-        focus: preset.focus,
-        durationMinutes: preset.durationMinutes,
-        mode: "shared",
-        name: preset.name,
-        description: preset.description,
-        shareable: preset.shareable,
-      }),
-    )
+export function buildSharedTrainings(input: { pois: Poi[]; origin: LatLon }) {
+  return SHARED_PRESETS.map((preset) =>
+    buildParcours({
+      pois: input.pois,
+      origin: input.origin,
+      focus: preset.focus,
+      durationMinutes: preset.durationMinutes,
+      mode: "shared",
+      name: preset.name,
+      description: preset.description,
+      shareable: preset.shareable,
+    }),
+  )
     .filter((parcours): parcours is Parcours => Boolean(parcours))
     .sort((left, right) => {
       if (left.durationMinutes !== right.durationMinutes) {

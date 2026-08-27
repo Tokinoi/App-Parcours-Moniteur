@@ -436,7 +436,9 @@ function HomeContent() {
                 >
                   <Image
                     source={poiIcon}
-                    style={isSelected ? styles.markerIconSelected : styles.markerIcon}
+                    style={
+                      isSelected ? styles.markerIconSelected : styles.markerIcon
+                    }
                     resizeMode="contain"
                   />
                 </Marker>
@@ -512,7 +514,12 @@ function HomeContent() {
 
       {/* Vadrouille panel */}
       {exploreMode && (
-        <View style={[styles.vadrouilleBottomSection, { paddingBottom: 32 + insets.bottom }]}>
+        <View
+          style={[
+            styles.vadrouilleBottomSection,
+            { paddingBottom: 32 + insets.bottom },
+          ]}
+        >
           <Pressable
             onPress={() => setExploreMode(false)}
             style={({ pressed }) => [styles.exitBar, pressed && styles.pressed]}
@@ -592,7 +599,12 @@ function HomeContent() {
           const step = activeParcours.steps[currentStepIndex];
           const isLast = currentStepIndex === activeParcours.steps.length - 1;
           return (
-            <View style={[styles.parcoursPanel, { paddingBottom: 32 + insets.bottom }]}>
+            <View
+              style={[
+                styles.parcoursPanel,
+                { paddingBottom: 32 + insets.bottom },
+              ]}
+            >
               <View style={styles.parcoursHeaderRow}>
                 <View style={styles.parcoursStepBadge}>
                   <Text style={styles.parcoursStepBadgeText}>

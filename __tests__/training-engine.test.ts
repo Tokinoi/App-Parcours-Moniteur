@@ -42,7 +42,8 @@ const pois: Poi[] = [
   {
     id: "poi-priorite",
     name: "Carrefour Saxe-Gambetta",
-    description: "Carrefour à feux avec priorité à droite sur les voies secondaires.",
+    description:
+      "Carrefour à feux avec priorité à droite sur les voies secondaires.",
     latitude: 45.7521,
     longitude: 4.8439,
     category: "Carrefour à feux",
@@ -91,10 +92,14 @@ describe("training engine", () => {
     const trainings = buildSharedTrainings({ pois, origin });
 
     expect(trainings.length).toBeGreaterThan(0);
-    expect(trainings.every((training) => training.mode === "shared")).toBe(true);
+    expect(trainings.every((training) => training.mode === "shared")).toBe(
+      true,
+    );
 
     const durations = trainings.map((training) => training.durationMinutes);
-    expect(durations).toEqual([...durations].sort((left, right) => left - right));
+    expect(durations).toEqual(
+      [...durations].sort((left, right) => left - right),
+    );
 
     expect(trainings[0]?.durationMinutes).toBe(20);
     expect(trainings[0]?.shareable).toBe(true);

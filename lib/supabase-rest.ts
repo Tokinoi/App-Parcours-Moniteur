@@ -1,6 +1,6 @@
 import { supabase } from "@/lib/supabase";
 import { buildSharedTrainings } from "@/lib/training-engine";
-import type { Parcours, ParcoursStep, Poi } from "@/lib/types";
+import type { Parcours, Poi } from "@/lib/types";
 
 type PoiRow = {
   id: string;
